@@ -144,6 +144,7 @@ tr:hover td { background: #f8fafc; }
         <tr>
           <th>Ad Soyad</th>
           <th>Vəzifə</th>
+          <th>Telefon</th>
           <th>Baxdığı Şirkətlər</th>
           <th></th>
         </tr>
@@ -168,9 +169,19 @@ tr:hover td { background: #f8fafc; }
       <input type="text" id="c-voen" placeholder="1234567890" maxlength="13" oninput="this.value=this.value.replace(/\D/g,'')">
     </div>
     <div class="form-row">
-      <label>Məsul Muhasib</label>
+      <label>Məsul Şəxs</label>
       <select id="c-acc">
         <option value="">— Seçin —</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Bu şirkətdə rolu</label>
+      <select id="c-rol">
+        <option value="Cari iş görən">Cari iş görən</option>
+        <option value="Hesabat verən">Hesabat verən</option>
+        <option value="Baş muhasib">Baş muhasib</option>
+        <option value="Nəzarətçi">Nəzarətçi</option>
+        <option value="Digər">Digər</option>
       </select>
     </div>
     <div class="form-row">
@@ -196,6 +207,10 @@ tr:hover td { background: #f8fafc; }
     <div class="form-row">
       <label>Vəzifə</label>
       <input type="text" id="a-vezife" placeholder="Muhasib">
+    </div>
+    <div class="form-row">
+      <label>Əlaqə nömrəsi</label>
+      <input type="tel" id="a-tel" placeholder="+994 50 000 00 00">
     </div>
     <div class="err" id="a-err"></div>
     <div class="mo-foot">
@@ -227,11 +242,12 @@ function initials(name) {
 function clearCompanyForm() {
   ['c-ad','c-voen','c-vergi'].forEach(id => document.getElementById(id).value='');
   document.getElementById('c-acc').value='';
+  document.getElementById('c-rol').value='Cari iş görən';
   document.getElementById('c-err').style.display='none';
   document.querySelector('#mo-company h3').textContent = '🏢 Şirkət əlavə et';
 }
 function clearAccForm() {
-  ['a-ad','a-vezife'].forEach(id => document.getElementById(id).value='');
+  ['a-ad','a-vezife','a-tel'].forEach(id => document.getElementById(id).value='');
   document.getElementById('a-err').style.display='none';
   document.querySelector('#mo-acc h3').textContent = '👤 Muhasib əlavə et';
 }
@@ -247,6 +263,7 @@ function addCompany() {
   const ad    = document.getElementById('c-ad').value.trim();
   const voen  = document.getElementById('c-voen').value.trim();
   const accId = document.getElementById('c-acc').value;
+  const rol   = document.getElementById('c-rol').value;
   const vergi = parseFloat(document.getElementById('c-vergi').value) || 0;
   const err   = document.getElementById('c-err');
 
@@ -257,9 +274,9 @@ function addCompany() {
   err.style.display='none';
 
   if(editCompanyIdx !== null) {
-    companies[editCompanyIdx] = { ...companies[editCompanyIdx], ad, voen, accId: accId||null, vergi };
+    companies[editCompanyIdx] = { ...companies[editCompanyIdx], ad, voen, accId: accId||null, rol, vergi };
   } else {
-    companies.push({ id: Date.now(), ad, voen, accId: accId||null, vergi });
+    companies.push({ id: Date.now(), ad, voen, accId: accId||null, rol, vergi });
   }
   closeMo('mo-company');
   renderAll();
@@ -272,6 +289,7 @@ function editCompany(idx) {
   document.getElementById('c-ad').value = c.ad;
   document.getElementById('c-voen').value = c.voen;
   document.getElementById('c-vergi').value = c.vergi;
+  document.getElementById('c-rol').value = c.rol || 'Cari iş görən';
   document.getElementById('c-err').style.display='none';
   document.querySelector('#mo-company h3').textContent = '✏️ Şirkəti düzəlt';
   document.getElementById('mo-company').classList.add('open');
@@ -287,14 +305,15 @@ function deleteCompany(idx) {
 function addAcc() {
   const ad     = document.getElementById('a-ad').value.trim();
   const vezife = document.getElementById('a-vezife').value.trim() || 'Muhasib';
+  const tel    = document.getElementById('a-tel').value.trim();
   const err    = document.getElementById('a-err');
   if(!ad) { err.textContent='Ad mütləqdir.'; err.style.display='block'; return; }
   err.style.display='none';
 
   if(editAccIdx !== null) {
-    accountants[editAccIdx] = { ...accountants[editAccIdx], ad, vezife };
+    accountants[editAccIdx] = { ...accountants[editAccIdx], ad, vezife, tel };
   } else {
-    accountants.push({ id: 'a'+Date.now(), ad, vezife, color: COLORS[accountants.length % COLORS.length] });
+    accountants.push({ id: 'a'+Date.now(), ad, vezife, tel, color: COLORS[accountants.length % COLORS.length] });
   }
   closeMo('mo-acc');
   renderAll();
@@ -305,6 +324,7 @@ function editAcc(idx) {
   const a = accountants[idx];
   document.getElementById('a-ad').value = a.ad;
   document.getElementById('a-vezife').value = a.vezife;
+  document.getElementById('a-tel').value = a.tel || '';
   document.getElementById('a-err').style.display='none';
   document.querySelector('#mo-acc h3').textContent = '✏️ Muhasibi düzəlt';
   document.getElementById('mo-acc').classList.add('open');
@@ -328,7 +348,9 @@ function renderCompany() {
   tbody.innerHTML = companies.map((c,i) => {
     const acc = c.accId ? accountants.find(a=>a.id==c.accId) : null;
     const accCell = acc
-      ? `<div class="acc-cell"><div class="avatar ${acc.color}">${initials(acc.ad)}</div><span>${acc.ad}</span></div>`
+      ? `<div class="acc-cell"><div class="avatar ${acc.color}">${initials(acc.ad)}</div>
+          <div><div>${acc.ad}</div><div style="font-size:11px;color:var(--text3)">${c.rol||''}</div></div>
+         </div>`
       : `<span style="color:var(--text3)">—</span>`;
     const hasTax = c.vergi > 0;
     const taxCell = `<span style="font-weight:600;font-family:monospace;color:${hasTax?'var(--red)':'var(--green)'}">${c.vergi.toFixed(2)} ₼</span>`;
@@ -360,6 +382,7 @@ function renderAcc() {
     return `<tr>
       <td><div class="acc-cell"><div class="avatar ${a.color}">${initials(a.ad)}</div><strong>${a.ad}</strong></div></td>
       <td style="color:var(--text2)">${a.vezife}</td>
+      <td style="font-family:monospace;font-size:12px;color:var(--text2)">${a.tel||'—'}</td>
       <td>${myCompanies}</td>
       <td>
         <button onclick="editAcc(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;margin-right:6px" title="Düzəlt">✏️</button>
