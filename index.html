@@ -3,253 +3,314 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CompanyControl — İdarə Paneli</title>
+<title>İdarə Paneli</title>
 <style>
 :root {
-  --bg:      #f0f4f8;
-  --sidebar: #1a2540;
-  --card:    #ffffff;
-  --accent:  #2563eb;
-  --accent2: #1e40af;
-  --green:   #16a34a;
-  --red:     #dc2626;
-  --yellow:  #d97706;
-  --text1:   #0f172a;
-  --text2:   #475569;
-  --text3:   #94a3b8;
-  --border:  #e2e8f0;
-  --radius:  10px;
+  --bg:     #f0f4f8;
+  --sidebar:#1a2540;
+  --card:   #ffffff;
+  --accent: #2563eb;
+  --green:  #16a34a;
+  --red:    #dc2626;
+  --yellow: #d97706;
+  --text1:  #0f172a;
+  --text2:  #475569;
+  --text3:  #94a3b8;
+  --border: #e2e8f0;
+  --radius: 10px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text1); font-family: 'Segoe UI', sans-serif; font-size: 14px; display: flex; min-height: 100vh; }
 
-/* ── Sidebar ── */
-.sidebar {
-  width: 240px; min-height: 100vh; background: var(--sidebar);
-  display: flex; flex-direction: column; flex-shrink: 0;
-  position: sticky; top: 0; height: 100vh;
-}
-.sidebar-logo {
-  padding: 24px 20px 20px;
-  border-bottom: 1px solid #ffffff15;
-}
-.sidebar-logo .app-name { color: #fff; font-size: 16px; font-weight: 700; }
-.sidebar-logo .app-sub  { color: #94a3b8; font-size: 11px; margin-top: 2px; }
+/* Sidebar */
+.sidebar { width: 220px; min-height: 100vh; background: var(--sidebar); display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh; }
+.sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid #ffffff15; }
+.sidebar-logo .app-name { color: #fff; font-size: 15px; font-weight: 700; }
 .sidebar-nav { padding: 16px 12px; flex: 1; }
-.nav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-radius: 8px; cursor: pointer;
-  color: #94a3b8; font-size: 13px; font-weight: 500;
-  transition: .15s; margin-bottom: 2px; text-decoration: none;
-}
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; color: #94a3b8; font-size: 13px; font-weight: 500; transition: .15s; margin-bottom: 2px; text-decoration: none; }
 .nav-item:hover { background: #ffffff12; color: #fff; }
 .nav-item.active { background: var(--accent); color: #fff; }
-.nav-icon { font-size: 16px; width: 20px; text-align: center; }
-.sidebar-footer {
-  padding: 16px 20px; border-top: 1px solid #ffffff15;
-  color: #475569; font-size: 11px;
-}
 
-/* ── Main ── */
-.main { flex: 1; padding: 28px 32px; overflow-y: auto; }
+/* Main */
+.main { flex: 1; padding: 28px 32px; }
 .page-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
 .page-sub { color: var(--text2); font-size: 13px; margin-bottom: 28px; }
 
-/* ── Cards ── */
-.card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px;
-  box-shadow: 0 1px 3px #0000000a;
-}
-.card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 16px; }
+/* Card */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 1px 3px #0000000a; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .4px; }
 
-/* ── Table ── */
-.tbl-wrap { overflow-x: auto; }
+/* Table */
 table { width: 100%; border-collapse: collapse; }
 th { font-size: 12px; color: var(--text2); font-weight: 600; padding: 8px 14px; text-align: left; border-bottom: 2px solid var(--border); }
 td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: #f8fafc; }
 
-/* ── Badge ── */
-.badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
-}
+/* Badge */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
 .badge-green  { background: #dcfce7; color: var(--green); }
 .badge-red    { background: #fee2e2; color: var(--red); }
-.badge-yellow { background: #fef3c7; color: var(--yellow); }
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.dot-green { background: var(--green); }
+.dot-red   { background: var(--red); }
 
-/* ── Avatar ── */
-.avatar {
-  width: 32px; height: 32px; border-radius: 50%;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
-}
-.av-blue   { background: #2563eb; }
-.av-indigo { background: #4f46e5; }
-.av-teal   { background: #0d9488; }
+/* Avatar */
+.avatar { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.av1 { background: #2563eb; } .av2 { background: #4f46e5; } .av3 { background: #0d9488; } .av4 { background: #7c3aed; } .av5 { background: #db2777; }
+.acc-cell { display: flex; align-items: center; gap: 8px; }
 
-.accountant-cell { display: flex; align-items: center; gap: 8px; }
-.acc-name { font-size: 13px; font-weight: 500; }
-.acc-role { font-size: 11px; color: var(--text3); }
+/* Button */
+.btn { border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #1d4ed8; }
 
-/* ── Tax alert ── */
-.tax-amount { font-weight: 600; font-family: monospace; }
-.tax-green  { color: var(--green); }
-.tax-red    { color: var(--red); }
-.tax-yellow { color: var(--yellow); }
+/* Modal */
+.mo-bg { display: none; position: fixed; inset: 0; background: #00000060; z-index: 100; align-items: center; justify-content: center; }
+.mo-bg.open { display: flex; }
+.mo { background: #fff; border-radius: 14px; padding: 28px; width: 420px; max-width: 95vw; box-shadow: 0 20px 60px #0000002a; }
+.mo h3 { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+.form-row { margin-bottom: 14px; }
+.form-row label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+.form-row input, .form-row select { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 13px; outline: none; color: var(--text1); transition: .15s; }
+.form-row input:focus, .form-row select:focus { border-color: var(--accent); }
+.mo-foot { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+.btn-cancel { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+.btn-cancel:hover { background: var(--border); }
+.err { color: var(--red); font-size: 12px; margin-top: 8px; display: none; }
 
-.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
-.dot-green  { background: var(--green); }
-.dot-red    { background: var(--red); }
-.dot-yellow { background: var(--yellow); }
+/* Empty */
+.empty { text-align: center; padding: 32px; color: var(--text3); font-size: 13px; }
 </style>
 </head>
 <body>
 
-<!-- Sidebar -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="app-name">CompanyControl</div>
-    <div class="app-sub">3V MMC İdarəetmə Sistemi</div>
+    <div class="app-name">İdarə Paneli</div>
   </div>
   <nav class="sidebar-nav">
     <a class="nav-item active" href="#">
-      <span class="nav-icon">🏢</span> İdarə Paneli
+      <span>🏢</span> Şirkətlər
     </a>
     <a class="nav-item" href="#">
-      <span class="nav-icon">💳</span> Kreditor
+      <span>💳</span> Kreditor
     </a>
     <a class="nav-item" href="#">
-      <span class="nav-icon">🔄</span> ƏDV Əvəzləşmə
+      <span>🔄</span> ƏDV Əvəzləşmə
     </a>
     <a class="nav-item" href="#">
-      <span class="nav-icon">📊</span> Hesabatlar
+      <span>📊</span> Hesabatlar
     </a>
   </nav>
-  <div class="sidebar-footer">v1.0 · 3V MMC © 2025</div>
 </aside>
 
-<!-- Main Content -->
 <main class="main">
   <div class="page-title">İdarə Paneli</div>
-  <div class="page-sub">Şirkətlər, muhasiblər və vergi vəziyyəti</div>
+  <div class="page-sub">Şirkətlər və muhasiblər</div>
 
-  <!-- Şirkətlər Cədvəli -->
+  <!-- Şirkətlər -->
   <div class="card">
-    <div class="card-title">🏢 Şirkətlər</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Şirkət adı</th>
-            <th>VÖEN</th>
-            <th>Məsul Muhasib</th>
-            <th>Vergi Borcu</th>
-            <th>Vəziyyət</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <tr>
-            <td>
-              <div style="font-weight:600">A MMC</div>
-              <div style="font-size:11px;color:var(--text3)">Ticarət · Bakı</div>
-            </td>
-            <td style="font-family:monospace;color:var(--text2)">1234567890</td>
-            <td>
-              <div class="accountant-cell">
-                <div class="avatar av-blue">AH</div>
-                <div>
-                  <div class="acc-name">Aytən Həsənova</div>
-                  <div class="acc-role">Baş Muhasib</div>
-                </div>
-              </div>
-            </td>
-            <td>
-              <span class="tax-amount tax-red">2,450.00 ₼</span>
-            </td>
-            <td>
-              <span class="badge badge-red">
-                <span class="dot dot-red"></span> Borc var
-              </span>
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <div style="font-weight:600">B MMC</div>
-              <div style="font-size:11px;color:var(--text3)">Xidmət · Bakı</div>
-            </td>
-            <td style="font-family:monospace;color:var(--text2)">1234567891</td>
-            <td>
-              <div class="accountant-cell">
-                <div class="avatar av-indigo">EM</div>
-                <div>
-                  <div class="acc-name">Elvin Məmmədov</div>
-                  <div class="acc-role">Muhasib</div>
-                </div>
-              </div>
-            </td>
-            <td>
-              <span class="tax-amount tax-green">0.00 ₼</span>
-            </td>
-            <td>
-              <span class="badge badge-green">
-                <span class="dot dot-green"></span> Təmiz
-              </span>
-            </td>
-          </tr>
-
-        </tbody>
-      </table>
+    <div class="card-header">
+      <div class="card-title">🏢 Şirkətlər</div>
+      <button class="btn btn-primary" onclick="openMo('mo-company')">+ Şirkət əlavə et</button>
     </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Şirkət adı</th>
+          <th>VÖEN</th>
+          <th>Məsul Muhasib</th>
+          <th>Vergi Borcu</th>
+          <th>Vəziyyət</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody-company">
+        <tr><td colspan="6" class="empty">Hələ şirkət əlavə edilməyib</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- Muhasiblər -->
   <div class="card">
-    <div class="card-title">👤 Muhasiblər</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Ad Soyad</th>
-            <th>Vəzifə</th>
-            <th>Baxdığı Şirkətlər</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <div class="accountant-cell">
-                <div class="avatar av-blue">AH</div>
-                <div>
-                  <div class="acc-name">Aytən Həsənova</div>
-                </div>
-              </div>
-            </td>
-            <td style="color:var(--text2)">Baş Muhasib</td>
-            <td>A MMC</td>
-          </tr>
-          <tr>
-            <td>
-              <div class="accountant-cell">
-                <div class="avatar av-indigo">EM</div>
-                <div>
-                  <div class="acc-name">Elvin Məmmədov</div>
-                </div>
-              </div>
-            </td>
-            <td style="color:var(--text2)">Muhasib</td>
-            <td>B MMC</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card-header">
+      <div class="card-title">👤 Muhasiblər</div>
+      <button class="btn btn-primary" onclick="openMo('mo-acc')">+ Muhasib əlavə et</button>
     </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Ad Soyad</th>
+          <th>Vəzifə</th>
+          <th>Baxdığı Şirkətlər</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody-acc">
+        <tr><td colspan="4" class="empty">Hələ muhasib əlavə edilməyib</td></tr>
+      </tbody>
+    </table>
   </div>
-
 </main>
 
+<!-- Modal: Şirkət -->
+<div class="mo-bg" id="mo-company">
+  <div class="mo">
+    <h3>🏢 Şirkət əlavə et</h3>
+    <div class="form-row">
+      <label>Şirkət adı</label>
+      <input type="text" id="c-ad" placeholder="A MMC">
+    </div>
+    <div class="form-row">
+      <label>VÖEN</label>
+      <input type="text" id="c-voen" placeholder="1234567890" maxlength="13">
+    </div>
+    <div class="form-row">
+      <label>Məsul Muhasib</label>
+      <select id="c-acc">
+        <option value="">— Seçin —</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Vergi Borcu (₼)</label>
+      <input type="number" id="c-vergi" placeholder="0.00" min="0" step="0.01">
+    </div>
+    <div class="err" id="c-err"></div>
+    <div class="mo-foot">
+      <button class="btn btn-cancel" onclick="closeMo('mo-company')">Ləğv et</button>
+      <button class="btn btn-primary" onclick="addCompany()">Əlavə et</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Muhasib -->
+<div class="mo-bg" id="mo-acc">
+  <div class="mo">
+    <h3>👤 Muhasib əlavə et</h3>
+    <div class="form-row">
+      <label>Ad Soyad</label>
+      <input type="text" id="a-ad" placeholder="Aytən Həsənova">
+    </div>
+    <div class="form-row">
+      <label>Vəzifə</label>
+      <input type="text" id="a-vezife" placeholder="Muhasib">
+    </div>
+    <div class="err" id="a-err"></div>
+    <div class="mo-foot">
+      <button class="btn btn-cancel" onclick="closeMo('mo-acc')">Ləğv et</button>
+      <button class="btn btn-primary" onclick="addAcc()">Əlavə et</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS = ['av1','av2','av3','av4','av5'];
+let companies = [];
+let accountants = [];
+
+function openMo(id) {
+  if(id==='mo-company') fillAccSelect();
+  document.getElementById(id).classList.add('open');
+}
+function closeMo(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mo-bg').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+
+function initials(name) {
+  return name.trim().split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+
+function fillAccSelect() {
+  const sel = document.getElementById('c-acc');
+  sel.innerHTML = '<option value="">— Seçin —</option>' +
+    accountants.map((a,i) => `<option value="${i}">${a.ad}</option>`).join('');
+}
+
+function addCompany() {
+  const ad    = document.getElementById('c-ad').value.trim();
+  const voen  = document.getElementById('c-voen').value.trim();
+  const accIdx= document.getElementById('c-acc').value;
+  const vergi = parseFloat(document.getElementById('c-vergi').value) || 0;
+  const err   = document.getElementById('c-err');
+
+  if(!ad || !voen) { err.textContent = 'Şirkət adı və VÖEN mütləqdir.'; err.style.display='block'; return; }
+  if(companies.find(c=>c.voen===voen)) { err.textContent = 'Bu VÖEN artıq mövcuddur.'; err.style.display='block'; return; }
+  err.style.display='none';
+
+  companies.push({ ad, voen, accIdx: accIdx!=='' ? +accIdx : null, vergi });
+  ['c-ad','c-voen','c-vergi'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('c-acc').value='';
+  closeMo('mo-company');
+  renderCompany();
+}
+
+function addAcc() {
+  const ad     = document.getElementById('a-ad').value.trim();
+  const vezife = document.getElementById('a-vezife').value.trim() || 'Muhasib';
+  const err    = document.getElementById('a-err');
+  if(!ad) { err.textContent = 'Ad mütləqdir.'; err.style.display='block'; return; }
+  err.style.display='none';
+
+  accountants.push({ ad, vezife, color: COLORS[accountants.length % COLORS.length] });
+  document.getElementById('a-ad').value='';
+  document.getElementById('a-vezife').value='';
+  closeMo('mo-acc');
+  renderAcc();
+}
+
+function deleteCompany(idx) {
+  companies.splice(idx,1);
+  renderCompany();
+}
+function deleteAcc(idx) {
+  accountants.splice(idx,1);
+  renderAcc();
+}
+
+function renderCompany() {
+  const tbody = document.getElementById('tbody-company');
+  if(!companies.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Hələ şirkət əlavə edilməyib</td></tr>';
+    return;
+  }
+  tbody.innerHTML = companies.map((c,i) => {
+    const acc = c.accIdx !== null ? accountants[c.accIdx] : null;
+    const accCell = acc
+      ? `<div class="acc-cell"><div class="avatar ${acc.color}">${initials(acc.ad)}</div><span>${acc.ad}</span></div>`
+      : `<span style="color:var(--text3)">—</span>`;
+    const hasTax = c.vergi > 0;
+    const taxCell = `<span style="font-weight:600;font-family:monospace;color:${hasTax?'var(--red)':'var(--green)'}">${c.vergi.toFixed(2)} ₼</span>`;
+    const badge = hasTax
+      ? `<span class="badge badge-red"><span class="dot dot-red"></span> Borc var</span>`
+      : `<span class="badge badge-green"><span class="dot dot-green"></span> Təmiz</span>`;
+    return `<tr>
+      <td><strong>${c.ad}</strong></td>
+      <td style="font-family:monospace;color:var(--text2)">${c.voen}</td>
+      <td>${accCell}</td>
+      <td>${taxCell}</td>
+      <td>${badge}</td>
+      <td><button onclick="deleteCompany(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px" title="Sil">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAcc() {
+  const tbody = document.getElementById('tbody-acc');
+  if(!accountants.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">Hələ muhasib əlavə edilməyib</td></tr>';
+    return;
+  }
+  tbody.innerHTML = accountants.map((a,i) => {
+    const myCompanies = companies.filter(c=>c.accIdx===i).map(c=>c.ad).join(', ') || '—';
+    return `<tr>
+      <td><div class="acc-cell"><div class="avatar ${a.color}">${initials(a.ad)}</div><strong>${a.ad}</strong></div></td>
+      <td style="color:var(--text2)">${a.vezife}</td>
+      <td>${myCompanies}</td>
+      <td><button onclick="deleteAcc(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px" title="Sil">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+</script>
 </body>
 </html>
