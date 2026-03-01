@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kreditor</title>
+<style>
+:root {
+  --bg:#f0f4f8;--sidebar:#1a2540;--card:#ffffff;--accent:#2563eb;
+  --text1:#0f172a;--text2:#475569;--text3:#94a3b8;--border:#e2e8f0;--radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text1);font-family:'Segoe UI',sans-serif;font-size:14px;display:flex;min-height:100vh;}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid #ffffff15;}
+.sidebar-logo .app-name{color:#fff;font-size:15px;font-weight:700;}
+.sidebar-nav{padding:16px 12px;flex:1;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;color:#94a3b8;font-size:13px;font-weight:500;transition:.15s;margin-bottom:2px;text-decoration:none;}
+.nav-item:hover{background:#ffffff12;color:#fff;}
+.nav-item.active{background:var(--accent);color:#fff;}
+.main{flex:1;padding:28px 32px;display:flex;align-items:center;justify-content:center;}
+.center{text-align:center;}
+.center h2{font-size:22px;font-weight:700;margin-bottom:8px;}
+.center p{color:var(--text2);font-size:13px;}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="app-name">İdarə Paneli</div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="index.html"><span>🏢</span> Şirkətlər</a>
+    <a class="nav-item active" href="kreditor.html"><span>💳</span> Kreditor</a>
+    <a class="nav-item" href="#"><span>🔄</span> ƏDV Əvəzləşmə</a>
+    <a class="nav-item" href="#"><span>📊</span> Hesabatlar</a>
+  </nav>
+</aside>
+<main class="main">
+  <div class="center">
+    <div style="font-size:52px;margin-bottom:16px">💳</div>
+    <h2>Kreditor</h2>
+    <p>Hazırlanır. Nə əlavə edək?</p>
+  </div>
+</main>
+</body>
+</html>
