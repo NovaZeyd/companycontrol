@@ -165,7 +165,7 @@ tr:hover td { background: #f8fafc; }
     </div>
     <div class="form-row">
       <label>VÖEN</label>
-      <input type="text" id="c-voen" placeholder="1234567890" maxlength="13">
+      <input type="text" id="c-voen" placeholder="1234567890" maxlength="13" oninput="this.value=this.value.replace(/\D/g,'')">
     </div>
     <div class="form-row">
       <label>Məsul Muhasib</label>
@@ -209,9 +209,12 @@ tr:hover td { background: #f8fafc; }
 const COLORS = ['av1','av2','av3','av4','av5'];
 let companies = [];
 let accountants = [];
+let editCompanyIdx = null;
+let editAccIdx = null;
 
 function openMo(id) {
-  if(id==='mo-company') fillAccSelect();
+  if(id==='mo-company') { editCompanyIdx=null; fillAccSelect(); clearCompanyForm(); }
+  if(id==='mo-acc') { editAccIdx=null; clearAccForm(); }
   document.getElementById(id).classList.add('open');
 }
 function closeMo(id) { document.getElementById(id).classList.remove('open'); }
@@ -221,61 +224,109 @@ function initials(name) {
   return name.trim().split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
 
-function fillAccSelect() {
-  const sel = document.getElementById('c-acc');
-  sel.innerHTML = '<option value="">— Seçin —</option>' +
-    accountants.map((a,i) => `<option value="${i}">${a.ad}</option>`).join('');
+function clearCompanyForm() {
+  ['c-ad','c-voen','c-vergi'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('c-acc').value='';
+  document.getElementById('c-err').style.display='none';
+  document.querySelector('#mo-company h3').textContent = '🏢 Şirkət əlavə et';
+}
+function clearAccForm() {
+  ['a-ad','a-vezife'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('a-err').style.display='none';
+  document.querySelector('#mo-acc h3').textContent = '👤 Muhasib əlavə et';
 }
 
+function fillAccSelect(selectedId) {
+  const sel = document.getElementById('c-acc');
+  sel.innerHTML = '<option value="">— Seçin —</option>' +
+    accountants.map(a => `<option value="${a.id}" ${selectedId===a.id?'selected':''}>${a.ad}</option>`).join('');
+}
+
+// ── Şirkət ──
 function addCompany() {
   const ad    = document.getElementById('c-ad').value.trim();
   const voen  = document.getElementById('c-voen').value.trim();
-  const accIdx= document.getElementById('c-acc').value;
+  const accId = document.getElementById('c-acc').value;
   const vergi = parseFloat(document.getElementById('c-vergi').value) || 0;
   const err   = document.getElementById('c-err');
 
-  if(!ad || !voen) { err.textContent = 'Şirkət adı və VÖEN mütləqdir.'; err.style.display='block'; return; }
-  if(companies.find(c=>c.voen===voen)) { err.textContent = 'Bu VÖEN artıq mövcuddur.'; err.style.display='block'; return; }
+  if(!ad || !voen) { err.textContent='Şirkət adı və VÖEN mütləqdir.'; err.style.display='block'; return; }
+  if(companies.find(c=>c.voen===voen && c.id!==(editCompanyIdx!==null?companies[editCompanyIdx].id:null))) {
+    err.textContent='Bu VÖEN artıq mövcuddur.'; err.style.display='block'; return;
+  }
   err.style.display='none';
 
-  companies.push({ ad, voen, accIdx: accIdx!=='' ? +accIdx : null, vergi });
-  ['c-ad','c-voen','c-vergi'].forEach(id => document.getElementById(id).value='');
-  document.getElementById('c-acc').value='';
+  if(editCompanyIdx !== null) {
+    companies[editCompanyIdx] = { ...companies[editCompanyIdx], ad, voen, accId: accId||null, vergi };
+  } else {
+    companies.push({ id: Date.now(), ad, voen, accId: accId||null, vergi });
+  }
   closeMo('mo-company');
-  renderCompany();
+  renderAll();
 }
 
+function editCompany(idx) {
+  editCompanyIdx = idx;
+  const c = companies[idx];
+  fillAccSelect(c.accId);
+  document.getElementById('c-ad').value = c.ad;
+  document.getElementById('c-voen').value = c.voen;
+  document.getElementById('c-vergi').value = c.vergi;
+  document.getElementById('c-err').style.display='none';
+  document.querySelector('#mo-company h3').textContent = '✏️ Şirkəti düzəlt';
+  document.getElementById('mo-company').classList.add('open');
+}
+
+function deleteCompany(idx) {
+  if(!confirm('Şirkəti silmək istəyirsiniz?')) return;
+  companies.splice(idx,1);
+  renderAll();
+}
+
+// ── Muhasib ──
 function addAcc() {
   const ad     = document.getElementById('a-ad').value.trim();
   const vezife = document.getElementById('a-vezife').value.trim() || 'Muhasib';
   const err    = document.getElementById('a-err');
-  if(!ad) { err.textContent = 'Ad mütləqdir.'; err.style.display='block'; return; }
+  if(!ad) { err.textContent='Ad mütləqdir.'; err.style.display='block'; return; }
   err.style.display='none';
 
-  accountants.push({ ad, vezife, color: COLORS[accountants.length % COLORS.length] });
-  document.getElementById('a-ad').value='';
-  document.getElementById('a-vezife').value='';
+  if(editAccIdx !== null) {
+    accountants[editAccIdx] = { ...accountants[editAccIdx], ad, vezife };
+  } else {
+    accountants.push({ id: 'a'+Date.now(), ad, vezife, color: COLORS[accountants.length % COLORS.length] });
+  }
   closeMo('mo-acc');
-  renderAcc();
+  renderAll();
 }
 
-function deleteCompany(idx) {
-  companies.splice(idx,1);
-  renderCompany();
+function editAcc(idx) {
+  editAccIdx = idx;
+  const a = accountants[idx];
+  document.getElementById('a-ad').value = a.ad;
+  document.getElementById('a-vezife').value = a.vezife;
+  document.getElementById('a-err').style.display='none';
+  document.querySelector('#mo-acc h3').textContent = '✏️ Muhasibi düzəlt';
+  document.getElementById('mo-acc').classList.add('open');
 }
+
 function deleteAcc(idx) {
+  if(!confirm('Muhasibi silmək istəyirsiniz?')) return;
   accountants.splice(idx,1);
-  renderAcc();
+  renderAll();
 }
+
+// ── Render ──
+function renderAll() { renderCompany(); renderAcc(); }
 
 function renderCompany() {
   const tbody = document.getElementById('tbody-company');
   if(!companies.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">Hələ şirkət əlavə edilməyib</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">Hələ şirkət əlavə edilməyib</td></tr>';
     return;
   }
   tbody.innerHTML = companies.map((c,i) => {
-    const acc = c.accIdx !== null ? accountants[c.accIdx] : null;
+    const acc = c.accId ? accountants.find(a=>a.id==c.accId) : null;
     const accCell = acc
       ? `<div class="acc-cell"><div class="avatar ${acc.color}">${initials(acc.ad)}</div><span>${acc.ad}</span></div>`
       : `<span style="color:var(--text3)">—</span>`;
@@ -290,7 +341,10 @@ function renderCompany() {
       <td>${accCell}</td>
       <td>${taxCell}</td>
       <td>${badge}</td>
-      <td><button onclick="deleteCompany(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px" title="Sil">🗑</button></td>
+      <td>
+        <button onclick="editCompany(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;margin-right:6px" title="Düzəlt">✏️</button>
+        <button onclick="deleteCompany(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px" title="Sil">🗑</button>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -302,12 +356,15 @@ function renderAcc() {
     return;
   }
   tbody.innerHTML = accountants.map((a,i) => {
-    const myCompanies = companies.filter(c=>c.accIdx===i).map(c=>c.ad).join(', ') || '—';
+    const myCompanies = companies.filter(c=>c.accId==a.id).map(c=>c.ad).join(', ') || '—';
     return `<tr>
       <td><div class="acc-cell"><div class="avatar ${a.color}">${initials(a.ad)}</div><strong>${a.ad}</strong></div></td>
       <td style="color:var(--text2)">${a.vezife}</td>
       <td>${myCompanies}</td>
-      <td><button onclick="deleteAcc(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px" title="Sil">🗑</button></td>
+      <td>
+        <button onclick="editAcc(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;margin-right:6px" title="Düzəlt">✏️</button>
+        <button onclick="deleteAcc(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px" title="Sil">🗑</button>
+      </td>
     </tr>`;
   }).join('');
 }
