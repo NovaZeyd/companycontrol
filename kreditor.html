@@ -9,6 +9,7 @@
 :root{
   --bg:#f0f4f8;--sidebar:#1a2540;--card:#fff;--accent:#2563eb;
   --green:#16a34a;--red:#dc2626;--yellow:#d97706;--orange:#ea580c;
+  --purple:#7c3aed;
   --text1:#0f172a;--text2:#475569;--text3:#94a3b8;--border:#e2e8f0;--radius:10px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -30,13 +31,14 @@ body{background:var(--bg);color:var(--text1);font-family:'Segoe UI',sans-serif;f
 
 /* KPI */
 .kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;flex:1;min-width:150px;box-shadow:0 1px 3px #0000000a;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;flex:1;min-width:140px;box-shadow:0 1px 3px #0000000a;}
 .kpi label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:4px;}
-.kpi .val{font-size:20px;font-weight:700;}
+.kpi .val{font-size:18px;font-weight:700;}
 .kpi.red .val{color:var(--red);}
 .kpi.grn .val{color:var(--green);}
 .kpi.ora .val{color:var(--orange);}
 .kpi.blu .val{color:var(--accent);}
+.kpi.pur .val{color:var(--purple);}
 
 /* Card */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;box-shadow:0 1px 3px #0000000a;}
@@ -66,6 +68,15 @@ body{background:var(--bg);color:var(--text1);font-family:'Segoe UI',sans-serif;f
 .btn-outline:hover{background:var(--bg);}
 .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
 
+/* Filter row */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+input[type=text]{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;outline:none;color:var(--text1);width:220px;}
+input[type=text]:focus{border-color:var(--accent);}
+input[type=date]{background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;outline:none;color:var(--text1);}
+input[type=date]:focus{border-color:var(--accent);}
+select.filter{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;outline:none;color:var(--text1);}
+.filter-label{font-size:11px;color:var(--text3);font-weight:600;white-space:nowrap;}
+
 /* Table */
 .tbl-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);}
 table{width:100%;border-collapse:collapse;font-size:13px;}
@@ -74,25 +85,33 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#f8fafc;}
 .num{text-align:right;font-family:monospace;font-size:12px;}
-.cname{max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-/* Search */
-input[type=text]{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;outline:none;color:var(--text1);width:240px;}
-input[type=text]:focus{border-color:var(--accent);}
-select.filter{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;outline:none;color:var(--text1);}
+.cname{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* Badge */
-.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
 .b-open{background:#fee2e2;color:var(--red);}
 .b-part{background:#fef3c7;color:var(--yellow);}
 .b-closed{background:#dcfce7;color:var(--green);}
 .b-mq{background:#fff7ed;color:var(--orange);}
+.b-avans{background:#ede9fe;color:var(--purple);}
+.b-vt-ok{background:#dcfce7;color:var(--green);}
+.b-vt-cancel{background:#fee2e2;color:var(--red);}
+.b-vt-pending{background:#fef3c7;color:var(--yellow);}
+.b-vt-other{background:#f1f5f9;color:var(--text2);}
+
+/* Avans table */
+.avans-badge{background:#ede9fe;color:var(--purple);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
 
 /* Log */
-.log-box{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);max-height:100px;overflow-y:auto;margin-top:10px;display:none;}
+.log-box{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);max-height:120px;overflow-y:auto;margin-top:10px;display:none;}
 
 /* Empty */
 .empty{text-align:center;padding:40px;color:var(--text3);font-size:13px;}
+
+/* Collapsible section */
+.section-toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;}
+.section-toggle:after{content:'▼';font-size:10px;color:var(--text3);transition:.2s;}
+.section-toggle.collapsed:after{content:'▶';}
 </style>
 </head>
 <body>
@@ -111,7 +130,7 @@ select.filter{background:#fff;border:1px solid var(--border);border-radius:8px;p
 
 <main class="main">
   <div class="page-title">💳 Kreditor</div>
-  <div class="page-sub">Gələn qaimələr · Bank ödənişləri · ƏDV depozit · Qalıq analizi</div>
+  <div class="page-sub">Gələn qaimələr · Bank ödənişləri · ƏDV depozit · Avans · Qalıq analizi</div>
 
   <!-- KPI -->
   <div class="kpi-row">
@@ -119,6 +138,7 @@ select.filter{background:#fff;border:1px solid var(--border);border-radius:8px;p
     <div class="kpi red"><label>Qalıq ƏDV Borc</label><div class="val" id="k-rem-edv">—</div></div>
     <div class="kpi grn"><label>Ödənilmiş Əsas</label><div class="val" id="k-paid-esas">—</div></div>
     <div class="kpi grn"><label>Ödənilmiş ƏDV</label><div class="val" id="k-paid-edv">—</div></div>
+    <div class="kpi pur"><label>Avans (Qaiməsiz)</label><div class="val" id="k-avans">—</div></div>
     <div class="kpi ora"><label>Geri Qaytarma</label><div class="val" id="k-mq">—</div></div>
     <div class="kpi blu"><label>Qaimə sayı</label><div class="val" id="k-count">—</div></div>
   </div>
@@ -127,7 +147,6 @@ select.filter{background:#fff;border:1px solid var(--border);border-radius:8px;p
   <div class="card">
     <div class="card-title" style="margin-bottom:14px">📥 Excel Import</div>
     <div class="import-grid">
-
       <div class="drop-zone" id="dz-inv">
         <input type="file" accept=".xlsx,.xls" multiple onchange="loadFiles('inv',this)">
         <div class="dz-icon">📄</div>
@@ -135,7 +154,6 @@ select.filter{background:#fff;border:1px solid var(--border);border-radius:8px;p
         <div class="dz-sub">e-taxes.gov.az formatı</div>
         <div class="dz-files" id="dz-inv-info"></div>
       </div>
-
       <div class="drop-zone" id="dz-bank">
         <input type="file" accept=".xlsx,.xls" multiple onchange="loadFiles('bank',this)">
         <div class="dz-icon">🏦</div>
@@ -143,7 +161,6 @@ select.filter{background:#fff;border:1px solid var(--border);border-radius:8px;p
         <div class="dz-sub">Bir və ya bir neçə fayl</div>
         <div class="dz-files" id="dz-bank-info"></div>
       </div>
-
       <div class="drop-zone" id="dz-edv">
         <input type="file" accept=".xlsx,.xls" multiple onchange="loadFiles('edv',this)">
         <div class="dz-icon">🧾</div>
@@ -151,9 +168,7 @@ select.filter{background:#fff;border:1px solid var(--border);border-radius:8px;p
         <div class="dz-sub">Sub-uçot hesabı</div>
         <div class="dz-files" id="dz-edv-info"></div>
       </div>
-
     </div>
-
     <div class="btn-row">
       <button class="btn btn-primary" onclick="runImport()">⚙️ İmport et və hesabla</button>
       <button class="btn btn-outline" onclick="clearAll()">🗑 Təmizlə</button>
@@ -161,57 +176,105 @@ select.filter{background:#fff;border:1px solid var(--border);border-radius:8px;p
     <div class="log-box" id="log-box"></div>
   </div>
 
-  <!-- Table -->
+  <!-- Invoice Table -->
   <div class="card">
     <div class="card-header">
-      <div class="card-title">📋 Qaimə siyahısı</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <div class="card-title section-toggle" onclick="toggleSection('inv-body','this')">📋 Qaimə siyahısı</div>
+      <button class="btn btn-success" onclick="exportExcel()">📤 Excel Export</button>
+    </div>
+
+    <!-- Filters -->
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+      <div class="filter-row">
         <input type="text" id="srch" placeholder="🔍 Şirkət / VÖEN / Nömrə" oninput="renderTable()">
-        <select class="filter" id="flt" onchange="renderTable()">
+        <span class="filter-label">Status:</span>
+        <select class="filter" id="flt-status" onchange="renderTable()">
           <option value="all">Hamısı</option>
           <option value="OPEN">Açıq</option>
           <option value="PARTIAL">Qismən</option>
           <option value="CLOSED">Bağlı</option>
           <option value="MQ">Geri qaytarma</option>
         </select>
-        <button class="btn btn-success" onclick="exportExcel()">📤 Excel Export</button>
+        <span class="filter-label">Vəziyyət:</span>
+        <select class="filter" id="flt-vez" onchange="renderTable()">
+          <option value="all">Hamısı</option>
+        </select>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">Tarix:</span>
+        <input type="date" id="flt-from" onchange="renderTable()" title="Başlanğıc tarixi">
+        <span class="filter-label">—</span>
+        <input type="date" id="flt-to" onchange="renderTable()" title="Son tarix">
+        <button class="btn btn-outline" style="padding:6px 12px;font-size:12px" onclick="clearDateFilter()">✕ Tarixi sıfırla</button>
       </div>
     </div>
 
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Tarix</th>
-            <th>Seriya</th>
-            <th>Nömrə</th>
-            <th>Şirkət</th>
-            <th>VÖEN</th>
-            <th class="num">Əsas</th>
-            <th class="num">ƏDV</th>
-            <th class="num">Ödən. Əsas</th>
-            <th class="num">Ödən. ƏDV</th>
-            <th class="num">Geri Əsas</th>
-            <th class="num">Geri ƏDV</th>
-            <th class="num">Qalıq Əsas</th>
-            <th class="num">Qalıq ƏDV</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
+    <div id="inv-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tarix</th>
+              <th>Seriya</th>
+              <th>Nömrə</th>
+              <th>Şirkət</th>
+              <th>VÖEN</th>
+              <th>Vəziyyət</th>
+              <th class="num">Əsas</th>
+              <th class="num">ƏDV</th>
+              <th class="num">Ödən. Əsas</th>
+              <th class="num">Ödən. ƏDV</th>
+              <th class="num">Geri Əsas</th>
+              <th class="num">Geri ƏDV</th>
+              <th class="num">Qalıq Əsas</th>
+              <th class="num">Qalıq ƏDV</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty-msg">Excel faylları import edin</div>
     </div>
-    <div class="empty" id="empty-msg">Excel faylları import edin</div>
   </div>
+
+  <!-- Avans Table -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title section-toggle" onclick="toggleSection('avans-body','this')">💜 Avans Ödənişlər <span id="avans-count-badge" style="display:none;"></span></div>
+      <span style="font-size:12px;color:var(--text3)">Qaimə gəlmədən əvvəl edilən bank ödənişləri</span>
+    </div>
+    <div id="avans-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Bank Tarixi</th>
+              <th>Şirkət (Alan)</th>
+              <th class="num">Bank Məbləği</th>
+              <th class="num">Tətbiq edilib</th>
+              <th class="num">Gözləyir</th>
+              <th>Təyinat</th>
+              <th>Vəziyyət</th>
+            </tr>
+          </thead>
+          <tbody id="avans-tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="avans-empty">Avans ödəniş tapılmadı</div>
+    </div>
+  </div>
+
 </main>
 
 <script>
 // ── State ──
 let rawFiles = { inv: [], bank: [], edv: [] };
-let invoices = [];
+let invoices  = [];
+let advances  = [];   // bank payments without matching invoices
 
 // ── Utils ──
-const fmt = n => (+n||0).toLocaleString('az-AZ',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt  = n => (+n||0).toLocaleString('az-AZ',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtM = n => fmt(n) + ' ₼';
 
 function log(msg) {
@@ -221,10 +284,16 @@ function log(msg) {
   box.scrollTop = box.scrollHeight;
 }
 
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
 function loadFiles(type, input) {
   rawFiles[type] = Array.from(input.files);
   const info = document.getElementById('dz-'+type+'-info');
-  const dz = document.getElementById('dz-'+type);
+  const dz   = document.getElementById('dz-'+type);
   if(rawFiles[type].length) {
     info.textContent = rawFiles[type].map(f=>f.name).join(', ');
     dz.classList.add('loaded');
@@ -235,8 +304,9 @@ function loadFiles(type, input) {
 }
 
 function clearAll() {
-  rawFiles = { inv: [], bank: [], edv: [] };
-  invoices = [];
+  rawFiles  = { inv:[], bank:[], edv:[] };
+  invoices  = [];
+  advances  = [];
   ['inv','bank','edv'].forEach(t => {
     document.getElementById('dz-'+t+'-info').textContent = '';
     document.getElementById('dz-'+t).classList.remove('loaded');
@@ -245,14 +315,20 @@ function clearAll() {
   document.getElementById('log-box').style.display = 'none';
   document.getElementById('log-box').innerHTML = '';
   renderTable();
+  renderAdvances();
   updateKPI();
+}
+
+function clearDateFilter() {
+  document.getElementById('flt-from').value = '';
+  document.getElementById('flt-to').value   = '';
+  renderTable();
 }
 
 // ── Date normalize ──
 function normDate(v) {
   if(!v) return '';
   if(typeof v === 'number') {
-    // Excel serial date
     const d = new Date(Math.round((v - 25569) * 86400 * 1000));
     return d.toISOString().slice(0,10);
   }
@@ -268,20 +344,32 @@ function readXlsx(file) {
   return new Promise(resolve => {
     const reader = new FileReader();
     reader.onload = e => {
-      const wb = XLSX.read(e.target.result, { type: 'binary', cellDates: false });
+      const wb = XLSX.read(e.target.result, { type:'binary', cellDates:false });
       const ws = wb.Sheets[wb.SheetNames[0]];
-      resolve(XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' }));
+      resolve(XLSX.utils.sheet_to_json(ws, { header:1, defval:'' }));
     };
     reader.readAsBinaryString(file);
   });
 }
 
-// ── Helper: Extract MT invoice numbers from bank description ──
-// Bank format: MT260110038047 = MT + 2601 (year-month) + 10038047 (no)
-// Spaces can appear mid-number (line-wrap artifact), e.g. "MT25121012 6683"
+// ── Vəziyyəti badge helper ──
+function vezBadge(v) {
+  if(!v) return '';
+  const s = String(v).trim();
+  const u = s.toUpperCase();
+  if(u.includes('LƏĞV') && u.includes('İMTİNA')) return `<span class="badge b-vt-ok" title="${s}">Ləğvdən imtina</span>`;
+  if(u.includes('LƏĞV')) return `<span class="badge b-vt-cancel" title="${s}">Ləğv</span>`;
+  if(u.includes('TƏSDİQLƏNDİ') || u.includes('SISTEM')) return `<span class="badge b-vt-ok" title="${s}">Təsdiq</span>`;
+  if(u.includes('GÖZLƏYİR') || u.includes('GÖNDƏRİLDİ')) return `<span class="badge b-vt-pending" title="${s}">Gözləyir</span>`;
+  if(u.includes('PASSİV') || u.includes('PASSIV')) return `<span class="badge b-vt-other" title="${s}">Passiv</span>`;
+  return `<span class="badge b-vt-other" title="${s}">${s.slice(0,16)}…</span>`;
+}
+
+// ── Extract MT numbers from bank description ──
+// Format: MT + 4-digit (year-month) + 8-digit (no) = 12 digits total
+// Spaces can appear in the middle (line-wrap artifact)
 function extractMTNumbers(text) {
   const result = [];
-  // Normalize: collapse spaces between digits right after "MT"
   const norm = text.replace(/\bMT(\d[\d ]{6,20})/gi, (_,d) => 'MT' + d.replace(/\s/g,''));
   const re = /MT(\d{12})/gi;
   let m;
@@ -291,21 +379,24 @@ function extractMTNumbers(text) {
   return result;
 }
 
-// ── Helper: Normalize company name for fuzzy matching ──
-// Converts Azerbaijani chars to Latin, strips legal form words
+// ── Company name normalization (Azerbaijani → Latin, remove legal form words) ──
 function normalizeName(name) {
   if(!name) return '';
-  return name.toUpperCase()
-    .replace(/["""«»]/g,'')
-    .replace(/Ə/g,'E').replace(/Ö/g,'O').replace(/Ü/g,'U')
-    .replace(/Ş/g,'S').replace(/Ğ/g,'G').replace(/Ç/g,'C')
-    .replace(/İ/g,'I').replace(/I\u0307/g,'I')
-    .replace(/\b(MEHDUL|MEHDUD|MƏHDUD|MASULIYYATLI|MƏSULİYYƏTLİ|MASULIYYTLI|MSULIYYTLI|CEMIYYETI|CƏMİYYƏTİ|CEMIYET|QAPALI|ACIQ|AÇIQ|SAHMDAR|SƏHMDAR|ISTEHSALAT|MMC|ASC|QSC|LLC|LTD|MHDUD|CMIYY|BIRLIYI|BİRLİYİ|PHŞ|PHS|SHIRKETI|CEM)\b/g,'')
+  return String(name).toUpperCase()
+    .replace(/["""«»"]/g,'')
+    .replace(/Ə/g,'E').replace(/ə/g,'E')
+    .replace(/Ö/g,'O').replace(/ö/g,'O')
+    .replace(/Ü/g,'U').replace(/ü/g,'U')
+    .replace(/Ş/g,'S').replace(/ş/g,'S')
+    .replace(/Ğ/g,'G').replace(/ğ/g,'G')
+    .replace(/Ç/g,'C').replace(/ç/g,'C')
+    .replace(/İ/g,'I').replace(/ı/g,'I')
+    .replace(/\b(MEHDUL|MEHDUD|MASULIYYATLI|CEMIYYETI|CEMIYET|QAPALI|ACIQ|SAHMDAR|ISTEHSALAT|MMC|ASC|QSC|LLC|LTD|MHDUD|MSULIYYYTLI|MSULIYYTLI|CMIYY|BIRLIYI|SERVIS|XIDMETLERI|SERV)\b/g,'')
     .replace(/[-.,\/]/g,' ')
     .replace(/\s+/g,' ').trim();
 }
 
-// Word-overlap fuzzy match: at least 1 key word (≥4 chars) in common
+// Word-overlap fuzzy match (at least 1 meaningful word ≥ 4 chars in common)
 function namesMatch(bankName, invName) {
   const b = normalizeName(bankName);
   const n = normalizeName(invName);
@@ -314,7 +405,16 @@ function namesMatch(bankName, invName) {
   if(b.includes(n) || n.includes(b)) return true;
   const bw = b.split(' ').filter(w=>w.length>=4);
   const nw = n.split(' ').filter(w=>w.length>=4);
-  return bw.some(w=>nw.includes(w));
+  return bw.some(w => nw.includes(w));
+}
+
+// ── Populate Vəziyyəti filter ──
+function populateVezFilter() {
+  const sel = document.getElementById('flt-vez');
+  const uniq = [...new Set(invoices.map(i=>i.veziyyet).filter(Boolean))].sort();
+  // Keep first option
+  sel.innerHTML = '<option value="all">Hamısı</option>' +
+    uniq.map(v => `<option value="${v}">${v}</option>`).join('');
 }
 
 // ── Import & Match ──
@@ -324,26 +424,29 @@ async function runImport() {
   }
   document.getElementById('log-box').innerHTML = '';
   invoices = [];
+  advances = [];
 
-  // 1. Parse invoices — only rows where col[1] is a 10-digit VÖEN
+  // ── 1. Parse invoices — only rows where col[1] is a 10-digit VÖEN ──
   for(const f of rawFiles.inv) {
     const rows = await readXlsx(f);
     let added = 0, dup = 0;
     rows.forEach(r => {
       if(!r[1] || !/^\d{10}$/.test(String(r[1]).trim())) return;
-      const voen   = String(r[1]).trim();
-      const ad     = String(r[2]||'').trim();
-      const tarix  = normDate(r[5]);
-      const seriya = String(r[6]||'').trim();
-      const no     = String(r[7]||'').trim();
-      const esas   = parseFloat(r[12])||0;
-      const edv    = parseFloat(r[13])||0;
-      const isMQ   = seriya.startsWith('MQ');
-      const isAA   = String(r[3]||'').trim() === 'AA';
-      const key    = voen+'|'+seriya+'|'+no;
+      const voen     = String(r[1]).trim();
+      const ad       = String(r[2]||'').trim();
+      const veziyyet = String(r[4]||'').trim();   // Vəziyyəti column
+      const tarix    = normDate(r[5]);
+      const seriya   = String(r[6]||'').trim();
+      const no       = String(r[7]||'').trim();
+      const esas     = parseFloat(r[12])||0;
+      const edv      = parseFloat(r[13])||0;
+      const isMQ     = seriya.startsWith('MQ');
+      const isAA     = String(r[3]||'').trim() === 'AA';
+      const key      = voen+'|'+seriya+'|'+no;
       if(invoices.find(i=>i.key===key)) { dup++; return; }
       invoices.push({
-        key, id:'inv'+invoices.length, voen, ad, tarix, seriya, no,
+        key, id:'inv'+invoices.length,
+        voen, ad, veziyyet, tarix, seriya, no,
         esas, edv, isMQ, isAA,
         paidEsas:0, paidEdv:0,
         mqEsas: isMQ?esas:0, mqEdv: isMQ?edv:0,
@@ -355,14 +458,13 @@ async function runImport() {
     log(`📄 ${f.name}: ${added} qaimə əlavə edildi${dup?' ('+dup+' dublikat)':''}`);
   }
 
-  // 2. Parse bank — TURA/XOHKS format
-  // Columns: №[0] | Tarix[1] | IBAN[2] | Məbləğ[3] | AZN[4] | Qalıq[5] | QalıqAZN[6] | Valyuta[7] | Təyinat[8]
-  // Outgoing = Məbləğ[3] < 0
+  // ── 2. Parse bank (TURA/XOHKS format) ──
+  // Col: №[0] | Tarix[1] | IBAN[2] | Məbləğ[3] | AZN[4] | Qalıq[5] | QalıqAZN[6] | Valyuta[7] | Təyinat[8]
   for(const f of rawFiles.bank) {
     const rows = await readXlsx(f);
-    let matched = 0;
+    let matched = 0, avansCnt = 0;
 
-    // Auto-detect header row (find row where first cell = '№')
+    // Auto-detect header row
     let dataStart = 1;
     for(let i=0;i<rows.length;i++) {
       if(String(rows[i][0]||'').trim() === '№') { dataStart = i+1; break; }
@@ -370,65 +472,91 @@ async function runImport() {
 
     rows.slice(dataStart).forEach(r => {
       const amount = parseFloat(r[3])||0;
-      if(amount >= 0) return;                  // only outgoing
+      if(amount >= 0) return;            // only outgoing
       const mebleg = Math.abs(amount);
       if(mebleg < 0.01) return;
 
       const teyin = String(r[8]||'');
       const tLow  = teyin.toLowerCase();
+      const tarix = normDate(r[1]);
 
-      // Skip service fees & internal transfers
+      // Skip service fees, internal, FX
       if(tLow.includes('xidmət haqqı') || tLow.includes('xidmet haqqi')) return;
       if(tLow.includes('hesabin mohkemlendirilmesi')) return;
       if(tLow.includes('konvertasiya')) return;
       if(tLow.includes('multicurrency')) return;
 
-      // Extract "Alan: ..." company name from description
+      // Extract "Alan: ..." company from description
       const alanMatch = teyin.match(/Alan:\s*([^,\n]+?)(?:\s*$|\s*,)/i);
       const bankCompany = alanMatch ? alanMatch[1].trim() : '';
 
-      // Extract all MT invoice numbers (primary key)
+      // Extract all MT numbers (primary key)
       const mtList = extractMTNumbers(teyin);
-
       let rem = mebleg;
 
       // Level 1: MT number exact match
       for(const mt of mtList) {
         if(rem < 0.01) break;
-        const inv = invoices.find(i=>
-          i.seriya.toUpperCase()===mt.seriya.toUpperCase() &&
-          i.no===mt.no && !i.isMQ && !i.isAA
+        const inv = invoices.find(i =>
+          i.seriya.toUpperCase() === mt.seriya.toUpperCase() &&
+          i.no === mt.no && !i.isMQ && !i.isAA
         );
         if(inv && inv.remEsas > 0.01) {
           const alloc = Math.min(rem, inv.remEsas);
-          inv.paidEsas = +(inv.paidEsas+alloc).toFixed(2);
-          inv.remEsas  = +(inv.remEsas -alloc).toFixed(2);
-          rem = +(rem-alloc).toFixed(2);
+          inv.paidEsas = +(inv.paidEsas + alloc).toFixed(2);
+          inv.remEsas  = +(inv.remEsas  - alloc).toFixed(2);
+          rem = +(rem - alloc).toFixed(2);
           inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED':'PARTIAL';
           matched++;
         }
       }
 
-      // Level 2: Company name FIFO (for payments without MT or covering multiple old invoices)
+      // Level 2: Company name FIFO
       if(rem > 0.01 && bankCompany) {
         const open = invoices
-          .filter(i=> !i.isMQ && !i.isAA && i.remEsas>0.01 && namesMatch(bankCompany, i.ad))
-          .sort((a,b)=>a.tarix.localeCompare(b.tarix));
+          .filter(i => !i.isMQ && !i.isAA && i.remEsas > 0.01 && namesMatch(bankCompany, i.ad))
+          .sort((a,b) => a.tarix.localeCompare(b.tarix));
         for(const inv of open) {
           if(rem < 0.01) break;
           const alloc = Math.min(rem, inv.remEsas);
-          inv.paidEsas = +(inv.paidEsas+alloc).toFixed(2);
-          inv.remEsas  = +(inv.remEsas -alloc).toFixed(2);
-          rem = +(rem-alloc).toFixed(2);
+          inv.paidEsas = +(inv.paidEsas + alloc).toFixed(2);
+          inv.remEsas  = +(inv.remEsas  - alloc).toFixed(2);
+          rem = +(rem - alloc).toFixed(2);
           inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED':'PARTIAL';
           matched++;
         }
       }
+
+      // Remaining → Avans (unmatched bank payment, invoice may come later)
+      if(rem > 0.01) {
+        const label = bankCompany || (alanMatch ? alanMatch[1].trim() : '?');
+        // Merge with existing advance for same company+date
+        const existing = advances.find(a => a.bankCompany === label && a.tarix === tarix);
+        if(existing) {
+          existing.amount = +(existing.amount + rem).toFixed(2);
+          existing.rem    = +(existing.rem    + rem).toFixed(2);
+        } else {
+          advances.push({
+            id: 'adv'+advances.length,
+            tarix,
+            bankCompany: label,
+            amount: rem,
+            applied: 0,
+            rem,
+            teyin: teyin.slice(0,120)
+          });
+        }
+        avansCnt++;
+      }
     });
-    log(`🏦 ${f.name}: ${matched} bank eşləşməsi`);
+    log(`🏦 ${f.name}: ${matched} bank eşləşməsi${avansCnt?' · '+avansCnt+' avans qeydə alındı':''}`);
   }
 
-  // 3. Parse ƏDV depozit — only rows where col[1] is a 10-digit VÖEN + Məxaric > 0
+  // ── 3. Apply advances to remaining open invoices ──
+  // (Covers case: invoice loaded in same batch as bank, or advance → invoice match)
+  applyAdvances();
+
+  // ── 4. Parse ƏDV depozit ──
   for(const f of rawFiles.edv) {
     const rows = await readXlsx(f);
     let matched = 0;
@@ -438,57 +566,81 @@ async function runImport() {
       const mexaric = parseFloat(r[6])||0;
       if(mexaric <= 0.01) return;
       let rem = mexaric;
-
       const open = invoices
-        .filter(i=>i.voen===voen && !i.isMQ && !i.isAA && i.remEdv>0.01)
-        .sort((a,b)=>a.tarix.localeCompare(b.tarix));
+        .filter(i => i.voen===voen && !i.isMQ && !i.isAA && i.remEdv > 0.01)
+        .sort((a,b) => a.tarix.localeCompare(b.tarix));
       for(const inv of open) {
         if(rem < 0.01) break;
         const alloc = Math.min(rem, inv.remEdv);
-        inv.paidEdv = +(inv.paidEdv+alloc).toFixed(2);
-        inv.remEdv  = +(inv.remEdv -alloc).toFixed(2);
-        rem = +(rem-alloc).toFixed(2);
-        inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED':(inv.paidEsas>0||inv.paidEdv>0)?'PARTIAL':inv.status;
+        inv.paidEdv = +(inv.paidEdv + alloc).toFixed(2);
+        inv.remEdv  = +(inv.remEdv  - alloc).toFixed(2);
+        rem = +(rem - alloc).toFixed(2);
+        inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED'
+                   : (inv.paidEsas>0||inv.paidEdv>0) ? 'PARTIAL' : inv.status;
         matched++;
       }
     });
     log(`🧾 ${f.name}: ${matched} ƏDV depozit eşləşməsi`);
   }
 
-  log(`✅ Tamamlandı — ${invoices.length} qaimə`);
+  log(`✅ Tamamlandı — ${invoices.length} qaimə · ${advances.length} avans`);
+  populateVezFilter();
   renderTable();
+  renderAdvances();
   updateKPI();
+}
+
+// ── Apply advances to open invoices (by company name FIFO) ──
+function applyAdvances() {
+  for(const adv of advances) {
+    if(adv.rem < 0.01) continue;
+    const open = invoices
+      .filter(i => !i.isMQ && !i.isAA && i.remEsas > 0.01 && namesMatch(adv.bankCompany, i.ad))
+      .sort((a,b) => a.tarix.localeCompare(b.tarix));
+    for(const inv of open) {
+      if(adv.rem < 0.01) break;
+      const alloc = Math.min(adv.rem, inv.remEsas);
+      inv.paidEsas  = +(inv.paidEsas  + alloc).toFixed(2);
+      inv.remEsas   = +(inv.remEsas   - alloc).toFixed(2);
+      adv.rem       = +(adv.rem       - alloc).toFixed(2);
+      adv.applied   = +(adv.applied   + alloc).toFixed(2);
+      inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED':'PARTIAL';
+    }
+  }
 }
 
 // ── KPI ──
 function updateKPI() {
-  const norm = invoices.filter(i=>!i.isMQ && !i.isAA);
-  const remE  = norm.reduce((s,i)=>s+i.remEsas, 0);
-  const remEdv= norm.reduce((s,i)=>s+i.remEdv,  0);
-  const paidE = norm.reduce((s,i)=>s+i.paidEsas,0);
-  const paidEdv=norm.reduce((s,i)=>s+i.paidEdv, 0);
-  const mq    = invoices.filter(i=>i.isMQ).reduce((s,i)=>s+i.esas,0);
-  document.getElementById('k-rem-esas').textContent  = fmtM(remE);
-  document.getElementById('k-rem-edv').textContent   = fmtM(remEdv);
-  document.getElementById('k-paid-esas').textContent = fmtM(paidE);
-  document.getElementById('k-paid-edv').textContent  = fmtM(paidEdv);
-  document.getElementById('k-mq').textContent        = fmtM(mq);
+  const norm = invoices.filter(i => !i.isMQ && !i.isAA);
+  document.getElementById('k-rem-esas').textContent  = fmtM(norm.reduce((s,i)=>s+i.remEsas,0));
+  document.getElementById('k-rem-edv').textContent   = fmtM(norm.reduce((s,i)=>s+i.remEdv,0));
+  document.getElementById('k-paid-esas').textContent = fmtM(norm.reduce((s,i)=>s+i.paidEsas,0));
+  document.getElementById('k-paid-edv').textContent  = fmtM(norm.reduce((s,i)=>s+i.paidEdv,0));
+  document.getElementById('k-mq').textContent        = fmtM(invoices.filter(i=>i.isMQ).reduce((s,i)=>s+i.esas,0));
   document.getElementById('k-count').textContent     = norm.length;
+  const pendAdv = advances.reduce((s,a)=>s+a.rem,0);
+  document.getElementById('k-avans').textContent     = fmtM(pendAdv);
 }
 
-// ── Table ──
+// ── Render invoice table ──
 function renderTable() {
-  const q  = document.getElementById('srch').value.toLowerCase();
-  const flt= document.getElementById('flt').value;
-  let data = invoices.filter(i => {
-    if(q && !i.ad.toLowerCase().includes(q) && !i.voen.includes(q) && !i.no.includes(q)) return false;
-    if(flt==='MQ' && !i.isMQ) return false;
-    if(flt!=='all' && flt!=='MQ' && i.status!==flt) return false;
+  const q     = document.getElementById('srch').value.toLowerCase();
+  const fSt   = document.getElementById('flt-status').value;
+  const fVez  = document.getElementById('flt-vez').value;
+  const fFrom = document.getElementById('flt-from').value;   // 'YYYY-MM-DD' or ''
+  const fTo   = document.getElementById('flt-to').value;
+
+  const data = invoices.filter(i => {
+    if(q && !i.ad.toLowerCase().includes(q) && !i.voen.includes(q) && !i.no.includes(q) && !i.seriya.toLowerCase().includes(q)) return false;
+    if(fSt === 'MQ' && !i.isMQ) return false;
+    if(fSt !== 'all' && fSt !== 'MQ' && i.status !== fSt) return false;
+    if(fVez !== 'all' && i.veziyyet !== fVez) return false;
+    if(fFrom && i.tarix < fFrom) return false;
+    if(fTo   && i.tarix > fTo)   return false;
     return true;
   });
 
-  const empty = document.getElementById('empty-msg');
-  empty.style.display = data.length || invoices.length ? 'none' : 'block';
+  document.getElementById('empty-msg').style.display = data.length || invoices.length ? 'none':'block';
 
   const statusBadge = i => {
     if(i.isMQ) return '<span class="badge b-mq">Geri</span>';
@@ -499,13 +651,14 @@ function renderTable() {
   };
 
   document.getElementById('tbody').innerHTML = data.map(i => {
-    const remCls = (i.remEsas+i.remEdv)>0.01 ? 'color:var(--red)' : 'color:var(--green)';
+    const remCls = (i.remEsas+i.remEdv)>0.01 ? 'color:var(--red)':'color:var(--green)';
     return `<tr>
       <td>${i.tarix}</td>
       <td style="color:var(--accent);font-weight:600">${i.seriya}</td>
       <td style="font-family:monospace;font-size:12px">${i.no}</td>
       <td><div class="cname" title="${i.ad}">${i.ad}</div></td>
       <td style="font-family:monospace;font-size:11px;color:var(--text3)">${i.voen}</td>
+      <td>${vezBadge(i.veziyyet)}</td>
       <td class="num">${fmt(i.esas)}</td>
       <td class="num">${fmt(i.edv)}</td>
       <td class="num" style="color:var(--green)">${fmt(i.paidEsas)}</td>
@@ -516,28 +669,73 @@ function renderTable() {
       <td class="num" style="${remCls}">${fmt(i.remEdv)}</td>
       <td>${statusBadge(i)}</td>
     </tr>`;
-  }).join('') || `<tr><td colspan="14" class="empty">${invoices.length ? 'Nəticə tapılmadı' : ''}</td></tr>`;
+  }).join('') || `<tr><td colspan="15" class="empty">${invoices.length?'Nəticə tapılmadı':''}</td></tr>`;
+}
+
+// ── Render advances table ──
+function renderAdvances() {
+  const tbody = document.getElementById('avans-tbody');
+  const empty = document.getElementById('avans-empty');
+  const badge = document.getElementById('avans-count-badge');
+
+  if(!advances.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    badge.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  const pending = advances.filter(a=>a.rem>0.01).length;
+  badge.style.display = '';
+  badge.innerHTML = `<span class="badge b-avans">${advances.length} · ${pending} gözləyir</span>`;
+
+  tbody.innerHTML = advances.map(a => {
+    const remCls = a.rem>0.01 ? 'color:var(--purple);font-weight:600':'color:var(--green)';
+    const vst = a.rem > 0.01
+      ? '<span class="badge b-avans">Gözləyir</span>'
+      : '<span class="badge b-closed">Tətbiq edildi</span>';
+    return `<tr>
+      <td>${a.tarix}</td>
+      <td><div class="cname" title="${a.bankCompany}">${a.bankCompany}</div></td>
+      <td class="num">${fmt(a.amount)}</td>
+      <td class="num" style="color:var(--green)">${fmt(a.applied)}</td>
+      <td class="num" style="${remCls}">${fmt(a.rem)}</td>
+      <td style="font-size:11px;color:var(--text3);max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${a.teyin}">${a.teyin}</td>
+      <td>${vst}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ── Export ──
 function exportExcel() {
   if(!invoices.length) { alert('Əvvəlcə import edin.'); return; }
-  const header = ['Tarix','Seriya','Nömrə','Şirkət','VÖEN','Əsas','ƏDV','Ödən.Əsas','Ödən.ƏDV','Geri Əsas','Geri ƏDV','Qalıq Əsas','Qalıq ƏDV','Status'];
+  const header = ['Tarix','Seriya','Nömrə','Şirkət','VÖEN','Vəziyyət','Əsas','ƏDV','Ödən.Əsas','Ödən.ƏDV','Geri Əsas','Geri ƏDV','Qalıq Əsas','Qalıq ƏDV','Status'];
   const rows = invoices.map(i => [
-    i.tarix, i.seriya, i.no, i.ad, i.voen,
+    i.tarix, i.seriya, i.no, i.ad, i.voen, i.veziyyet,
     i.esas, i.edv, i.paidEsas, i.paidEdv,
     i.mqEsas, i.mqEdv, i.remEsas, i.remEdv,
-    i.isMQ?'Geri':i.isAA?'Avans':i.status
+    i.isMQ?'Geri': i.isAA?'Avans': i.status
   ]);
   const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
-  ws['!cols'] = header.map((_,i)=>({wch: i<4?28:i===3?32:14}));
+  ws['!cols'] = [14,8,10,32,12,18,12,10,12,10,10,10,12,10,10].map(w=>({wch:w}));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Kreditor');
+
+  // Avans sheet
+  if(advances.length) {
+    const ah = ['Bank Tarixi','Şirkət','Məbləğ','Tətbiq','Qalıq','Təyinat','Status'];
+    const ar = advances.map(a => [a.tarix, a.bankCompany, a.amount, a.applied, a.rem, a.teyin, a.rem>0.01?'Gözləyir':'Tətbiq edildi']);
+    const ws2 = XLSX.utils.aoa_to_sheet([ah,...ar]);
+    XLSX.utils.book_append_sheet(wb, ws2, 'Avans');
+  }
+
   XLSX.writeFile(wb, 'kreditor_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
 // init
 updateKPI();
+renderAdvances();
 </script>
 </body>
 </html>
