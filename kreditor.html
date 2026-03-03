@@ -276,6 +276,47 @@ function readXlsx(file) {
   });
 }
 
+// ── Helper: Extract MT invoice numbers from bank description ──
+// Bank format: MT260110038047 = MT + 2601 (year-month) + 10038047 (no)
+// Spaces can appear mid-number (line-wrap artifact), e.g. "MT25121012 6683"
+function extractMTNumbers(text) {
+  const result = [];
+  // Normalize: collapse spaces between digits right after "MT"
+  const norm = text.replace(/\bMT(\d[\d ]{6,20})/gi, (_,d) => 'MT' + d.replace(/\s/g,''));
+  const re = /MT(\d{12})/gi;
+  let m;
+  while((m = re.exec(norm)) !== null) {
+    result.push({ seriya: 'MT' + m[1].slice(0,4), no: m[1].slice(4) });
+  }
+  return result;
+}
+
+// ── Helper: Normalize company name for fuzzy matching ──
+// Converts Azerbaijani chars to Latin, strips legal form words
+function normalizeName(name) {
+  if(!name) return '';
+  return name.toUpperCase()
+    .replace(/["""«»]/g,'')
+    .replace(/Ə/g,'E').replace(/Ö/g,'O').replace(/Ü/g,'U')
+    .replace(/Ş/g,'S').replace(/Ğ/g,'G').replace(/Ç/g,'C')
+    .replace(/İ/g,'I').replace(/I\u0307/g,'I')
+    .replace(/\b(MEHDUL|MEHDUD|MƏHDUD|MASULIYYATLI|MƏSULİYYƏTLİ|MASULIYYTLI|MSULIYYTLI|CEMIYYETI|CƏMİYYƏTİ|CEMIYET|QAPALI|ACIQ|AÇIQ|SAHMDAR|SƏHMDAR|ISTEHSALAT|MMC|ASC|QSC|LLC|LTD|MHDUD|CMIYY|BIRLIYI|BİRLİYİ|PHŞ|PHS|SHIRKETI|CEM)\b/g,'')
+    .replace(/[-.,\/]/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+
+// Word-overlap fuzzy match: at least 1 key word (≥4 chars) in common
+function namesMatch(bankName, invName) {
+  const b = normalizeName(bankName);
+  const n = normalizeName(invName);
+  if(!b || !n) return false;
+  if(b === n) return true;
+  if(b.includes(n) || n.includes(b)) return true;
+  const bw = b.split(' ').filter(w=>w.length>=4);
+  const nw = n.split(' ').filter(w=>w.length>=4);
+  return bw.some(w=>nw.includes(w));
+}
+
 // ── Import & Match ──
 async function runImport() {
   if(!rawFiles.inv.length && !rawFiles.bank.length && !rawFiles.edv.length) {
@@ -284,12 +325,12 @@ async function runImport() {
   document.getElementById('log-box').innerHTML = '';
   invoices = [];
 
-  // 1. Parse invoices
+  // 1. Parse invoices — only rows where col[1] is a 10-digit VÖEN
   for(const f of rawFiles.inv) {
     const rows = await readXlsx(f);
     let added = 0, dup = 0;
-    rows.slice(1).forEach(r => {
-      if(!r[1]) return;
+    rows.forEach(r => {
+      if(!r[1] || !/^\d{10}$/.test(String(r[1]).trim())) return;
       const voen   = String(r[1]).trim();
       const ad     = String(r[2]||'').trim();
       const tarix  = normDate(r[5]);
@@ -302,77 +343,84 @@ async function runImport() {
       const key    = voen+'|'+seriya+'|'+no;
       if(invoices.find(i=>i.key===key)) { dup++; return; }
       invoices.push({
-        key, id: 'inv'+invoices.length, voen, ad, tarix, seriya, no,
+        key, id:'inv'+invoices.length, voen, ad, tarix, seriya, no,
         esas, edv, isMQ, isAA,
-        paidEsas: 0, paidEdv: 0,
-        mqEsas: isMQ ? esas : 0,
-        mqEdv:  isMQ ? edv  : 0,
-        remEsas: isMQ ? 0 : esas,
-        remEdv:  isMQ ? 0 : edv,
-        status: isAA ? 'AA' : isMQ ? 'MQ' : 'OPEN'
+        paidEsas:0, paidEdv:0,
+        mqEsas: isMQ?esas:0, mqEdv: isMQ?edv:0,
+        remEsas: isMQ?0:esas, remEdv: isMQ?0:edv,
+        status: isAA?'AA': isMQ?'MQ':'OPEN'
       });
       added++;
     });
     log(`📄 ${f.name}: ${added} qaimə əlavə edildi${dup?' ('+dup+' dublikat)':''}`);
   }
 
-  // 2. Parse bank — match esas payments
+  // 2. Parse bank — TURA/XOHKS format
+  // Columns: №[0] | Tarix[1] | IBAN[2] | Məbləğ[3] | AZN[4] | Qalıq[5] | QalıqAZN[6] | Valyuta[7] | Təyinat[8]
+  // Outgoing = Məbləğ[3] < 0
   for(const f of rawFiles.bank) {
     const rows = await readXlsx(f);
     let matched = 0;
-    rows.slice(1).forEach(r => {
-      // Try col indexes: find date, amount, description, voen
-      // Standard AIIB format: col1=tarix, col4=mebleg(negative=debit), col8=teyin, col3=eks(voen at end)
-      const tarix  = normDate(r[1]);
-      const mebleg = Math.abs(parseFloat(r[4])||0);
-      const teyin  = String(r[8]||r[6]||'');
-      const eksStr = String(r[3]||'');
-      const debit  = parseFloat(r[4])||0;
 
-      // Only outgoing (debit/negative)
-      if(debit >= 0 && parseFloat(r[4]) >= 0) return;
+    // Auto-detect header row (find row where first cell = '№')
+    let dataStart = 1;
+    for(let i=0;i<rows.length;i++) {
+      if(String(rows[i][0]||'').trim() === '№') { dataStart = i+1; break; }
+    }
+
+    rows.slice(dataStart).forEach(r => {
+      const amount = parseFloat(r[3])||0;
+      if(amount >= 0) return;                  // only outgoing
+      const mebleg = Math.abs(amount);
       if(mebleg < 0.01) return;
 
-      // Skip EDV payments — they'll be handled by EDV file
-      const tUp = teyin.toUpperCase();
-      if(tUp.includes('EDV') || tUp.includes('ƏDV')) return;
-      // Skip internal/loan/POS
-      if(['COCS','POS','REVERSI','FAİZ','FAIZ'].some(s=>tUp.includes(s))) return;
+      const teyin = String(r[8]||'');
+      const tLow  = teyin.toLowerCase();
 
-      // Extract VÖEN from eks
-      const vm = eksStr.match(/\/\s*(\d{10,13})\s*$/);
-      const voen = vm ? vm[1] : '';
-      if(!voen || voen === '2302351311') return;
+      // Skip service fees & internal transfers
+      if(tLow.includes('xidmət haqqı') || tLow.includes('xidmet haqqi')) return;
+      if(tLow.includes('hesabin mohkemlendirilmesi')) return;
+      if(tLow.includes('konvertasiya')) return;
+      if(tLow.includes('multicurrency')) return;
 
-      // Extract seriya+no from teyin
-      const sm = teyin.match(/(MT\d{4})\s*(\d{7,9})/i);
+      // Extract "Alan: ..." company name from description
+      const alanMatch = teyin.match(/Alan:\s*([^,\n]+?)(?:\s*$|\s*,)/i);
+      const bankCompany = alanMatch ? alanMatch[1].trim() : '';
+
+      // Extract all MT invoice numbers (primary key)
+      const mtList = extractMTNumbers(teyin);
+
       let rem = mebleg;
 
-      // Lvl1: direct seriya+no
-      if(sm) {
-        const inv = invoices.find(i => i.seriya===sm[1].toUpperCase() && i.no===sm[2] && !i.isMQ && !i.isAA);
+      // Level 1: MT number exact match
+      for(const mt of mtList) {
+        if(rem < 0.01) break;
+        const inv = invoices.find(i=>
+          i.seriya.toUpperCase()===mt.seriya.toUpperCase() &&
+          i.no===mt.no && !i.isMQ && !i.isAA
+        );
         if(inv && inv.remEsas > 0.01) {
           const alloc = Math.min(rem, inv.remEsas);
-          inv.paidEsas  = +(inv.paidEsas + alloc).toFixed(2);
-          inv.remEsas   = +(inv.remEsas  - alloc).toFixed(2);
-          rem = +(rem - alloc).toFixed(2);
-          inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED' : 'PARTIAL';
+          inv.paidEsas = +(inv.paidEsas+alloc).toFixed(2);
+          inv.remEsas  = +(inv.remEsas -alloc).toFixed(2);
+          rem = +(rem-alloc).toFixed(2);
+          inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED':'PARTIAL';
           matched++;
         }
       }
 
-      // Lvl2: FIFO by VÖEN
-      if(rem > 0.01 && voen) {
+      // Level 2: Company name FIFO (for payments without MT or covering multiple old invoices)
+      if(rem > 0.01 && bankCompany) {
         const open = invoices
-          .filter(i=>i.voen===voen && !i.isMQ && !i.isAA && i.remEsas>0.01)
+          .filter(i=> !i.isMQ && !i.isAA && i.remEsas>0.01 && namesMatch(bankCompany, i.ad))
           .sort((a,b)=>a.tarix.localeCompare(b.tarix));
         for(const inv of open) {
           if(rem < 0.01) break;
           const alloc = Math.min(rem, inv.remEsas);
-          inv.paidEsas  = +(inv.paidEsas + alloc).toFixed(2);
-          inv.remEsas   = +(inv.remEsas  - alloc).toFixed(2);
-          rem = +(rem - alloc).toFixed(2);
-          inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED' : 'PARTIAL';
+          inv.paidEsas = +(inv.paidEsas+alloc).toFixed(2);
+          inv.remEsas  = +(inv.remEsas -alloc).toFixed(2);
+          rem = +(rem-alloc).toFixed(2);
+          inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED':'PARTIAL';
           matched++;
         }
       }
@@ -380,13 +428,13 @@ async function runImport() {
     log(`🏦 ${f.name}: ${matched} bank eşləşməsi`);
   }
 
-  // 3. Parse EDV depozit — match edv payments
+  // 3. Parse ƏDV depozit — only rows where col[1] is a 10-digit VÖEN + Məxaric > 0
   for(const f of rawFiles.edv) {
     const rows = await readXlsx(f);
     let matched = 0;
-    rows.slice(2).forEach(r => {
-      if(!r[1]) return;
-      const voen   = String(r[1]).trim();
+    rows.forEach(r => {
+      if(!r[1] || !/^\d{10}$/.test(String(r[1]).trim())) return;
+      const voen    = String(r[1]).trim();
       const mexaric = parseFloat(r[6])||0;
       if(mexaric <= 0.01) return;
       let rem = mexaric;
@@ -397,10 +445,10 @@ async function runImport() {
       for(const inv of open) {
         if(rem < 0.01) break;
         const alloc = Math.min(rem, inv.remEdv);
-        inv.paidEdv = +(inv.paidEdv + alloc).toFixed(2);
-        inv.remEdv  = +(inv.remEdv  - alloc).toFixed(2);
-        rem = +(rem - alloc).toFixed(2);
-        inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED' : (inv.paidEsas>0||inv.paidEdv>0) ? 'PARTIAL' : inv.status;
+        inv.paidEdv = +(inv.paidEdv+alloc).toFixed(2);
+        inv.remEdv  = +(inv.remEdv -alloc).toFixed(2);
+        rem = +(rem-alloc).toFixed(2);
+        inv.status = inv.remEsas<=0.01 && inv.remEdv<=0.01 ? 'CLOSED':(inv.paidEsas>0||inv.paidEdv>0)?'PARTIAL':inv.status;
         matched++;
       }
     });
